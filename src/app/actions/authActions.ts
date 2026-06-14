@@ -17,7 +17,25 @@ export async function login(formData: FormData) {
   try {
     const prisma = getPrisma();
 
-    const userCount = await prisma.user.count();
+    let userCount = 0;
+    try {
+      userCount = await prisma.user.count();
+    } catch (tableErr: unknown) {
+      const msg =
+        tableErr instanceof Error ? tableErr.message : "";
+      if (
+        msg.includes("does not exist") ||
+        msg.includes("relation") ||
+        msg.includes("Base table")
+      ) {
+        return {
+          error:
+            "لم يتم العثور على جداول قاعدة البيانات. يُرجى فتح Supabase Dashboard ← SQL Editor ← New Query وتشغيل ملف schema.sql.",
+        };
+      }
+      throw tableErr;
+    }
+
     if (userCount === 0) {
       const hashedPassword = await bcrypt.hash("password123", 12);
       await prisma.user.create({
