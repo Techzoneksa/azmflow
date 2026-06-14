@@ -38,7 +38,7 @@ const NAV_GROUPS = [
     label: "الإدارة",
     items: [
       { label: "المناديب", href: "/agents", icon: Users },
-      { label: "المركبات", href: "#", icon: Car },
+      { label: "المركبات", href: "/vehicles", icon: Car },
       { label: "الشركاء", href: "/partners", icon: Handshake },
       { label: "العقود", href: "#", icon: FileText },
     ],
