@@ -18,8 +18,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[LOGIN] form submitted");
     setError("");
     if (!username.trim()) {
+      console.log("[LOGIN] username empty");
       setError("يرجى إدخال اسم المستخدم");
       return;
     }
@@ -27,15 +29,25 @@ export default function LoginPage() {
     const formData = new FormData();
     formData.set("username", username);
     formData.set("password", password);
-    const result = await login(formData);
-    setLoading(false);
-    if (result?.error) {
-      setError(result.error);
+    console.log("[LOGIN] calling server action...");
+    try {
+      const result = await login(formData);
+      console.log("[LOGIN] server action returned:", result);
+      setLoading(false);
+      if (result?.error) {
+        setError(result.error);
+      }
+    } catch (err) {
+      console.error("[LOGIN] unexpected client error:", err);
+      setLoading(false);
+      setError("حدث خطأ غير متوقع في المتصفح.");
     }
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center bg-background overflow-hidden"
+      onClick={() => console.log("[LOGIN] page clicked")}
+    >
       <div
         className="absolute inset-0"
         style={{
@@ -123,6 +135,7 @@ export default function LoginPage() {
                 type="submit"
                 className="w-full h-11 text-base font-semibold"
                 disabled={loading}
+                onClick={() => console.log("[LOGIN] submit button clicked")}
               >
                 {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
               </Button>

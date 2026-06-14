@@ -6,14 +6,15 @@ import { redirect } from "next/navigation";
 import { getPrisma } from "@/lib/prisma";
 
 export async function login(formData: FormData) {
+  const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
+
+  if (!username || !password) {
+    return { error: "يرجى إدخال اسم المستخدم وكلمة المرور" };
+  }
+
+  let user;
   try {
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
-
-    if (!username || !password) {
-      return { error: "يرجى إدخال اسم المستخدم وكلمة المرور" };
-    }
-
     const prisma = getPrisma();
 
     const userCount = await prisma.user.count();
@@ -30,7 +31,7 @@ export async function login(formData: FormData) {
       });
     }
 
-    const user = await prisma.user.findUnique({ where: { username } });
+    user = await prisma.user.findUnique({ where: { username } });
     if (!user) return { error: "بيانات الدخول غير صحيحة" };
 
     const isValid = await bcrypt.compare(password, user.password);
@@ -44,12 +45,12 @@ export async function login(formData: FormData) {
       path: "/",
       maxAge: 60 * 60 * 24,
     });
-
-    redirect("/dashboard");
   } catch (err) {
     console.error("[LOGIN_ERROR]", err);
-    return { error: "حدث خطأ في السيرفر أو الاتصال بقاعدة البيانات. يرجى المحاولة لاحقاً." };
+    return { error: "تعذر الاتصال بقاعدة البيانات. تحقق من متغير DATABASE_URL ثم أعد تشغيل الخادم." };
   }
+
+  redirect("/dashboard");
 }
 
 export async function logout() {
