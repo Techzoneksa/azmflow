@@ -13,21 +13,25 @@ export async function login(formData: FormData) {
     return { error: "يرجى إدخال اسم المستخدم وكلمة المرور" };
   }
 
-  const userCount = await prisma.user.count();
-  if (userCount === 0) {
-    const hashedPassword = await bcrypt.hash("password123", 12);
-    await prisma.user.create({
-      data: {
-        name: "مدير النظام",
-        username: "admin",
-        phone: "0500000000",
-        password: hashedPassword,
-        role: "ADMIN",
-      },
-    });
+  let user;
+  try {
+    const userCount = await prisma.user.count();
+    if (userCount === 0) {
+      const hashedPassword = await bcrypt.hash("password123", 12);
+      await prisma.user.create({
+        data: {
+          name: "مدير النظام",
+          username: "admin",
+          phone: "0500000000",
+          password: hashedPassword,
+          role: "ADMIN",
+        },
+      });
+    }
+    user = await prisma.user.findUnique({ where: { username } });
+  } catch {
+    return { error: "تعذر الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى" };
   }
-
-  const user = await prisma.user.findUnique({ where: { username } });
   if (!user) return { error: "بيانات الدخول غير صحيحة" };
 
   const isValid = await bcrypt.compare(password, user.password);
