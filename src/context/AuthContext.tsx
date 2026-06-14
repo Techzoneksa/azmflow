@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { login as serverLogin } from "@/app/actions/authActions";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -22,11 +23,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const router = useRouter();
 
-  const login = useCallback(async (username: string, _password: string): Promise<boolean> => {
-    void _password;
-    if (username.trim()) {
+  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
+    const result = await serverLogin(username, password);
+    if (result) {
       setIsAuthenticated(true);
-      setUser({ name: "مشرف النظام", role: "مدير" });
+      setUser({ name: result.name, role: result.role });
       return true;
     }
     return false;
