@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuth } from "@/context/AuthContext";
+import { login } from "@/app/actions/authActions";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -16,8 +15,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth();
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,12 +24,13 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    const success = await login(username, password);
+    const formData = new FormData();
+    formData.set("username", username);
+    formData.set("password", password);
+    const result = await login(formData);
     setLoading(false);
-    if (success) {
-      router.push("/dashboard");
-    } else {
-      setError("بيانات الدخول غير صحيحة");
+    if (result?.error) {
+      setError(result.error);
     }
   };
 
@@ -69,6 +67,7 @@ export default function LoginPage() {
                 <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
                 <Input
                   id="username"
+                  name="username"
                   placeholder="أدخل اسم المستخدم"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -84,6 +83,7 @@ export default function LoginPage() {
                 <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="أدخل كلمة المرور"
                   value={password}

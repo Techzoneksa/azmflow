@@ -1,46 +1,48 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { login as serverLogin } from "@/app/actions/authActions";
+import { getSession, logout as serverLogout } from "@/app/actions/authActions";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
   user: { name: string; role: string } | null;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
-  login: async () => false,
-  logout: () => {},
   user: null,
+  logout: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
-    const result = await serverLogin(username, password);
-    if (result) {
-      setIsAuthenticated(true);
-      setUser({ name: result.name, role: result.role });
-      return true;
-    }
-    return false;
+  useEffect(() => {
+    getSession().then((session) => {
+      if (session) {
+        setIsAuthenticated(true);
+        setUser({ name: session.name, role: session.role });
+      }
+      setLoading(false);
+    });
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await serverLogout();
     setIsAuthenticated(false);
     setUser(null);
     router.push("/login");
   }, [router]);
 
+  if (loading) return null;
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user }}>
+    <AuthContext.Provider value={{ isAuthenticated, logout, user }}>
       {children}
     </AuthContext.Provider>
   );
