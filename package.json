@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push && NODE_OPTIONS=\"-r ./scripts/patch-fs.js\" next build",
+    "build": "prisma generate && NODE_OPTIONS=\"-r ./scripts/patch-fs.js\" next build",
     "start": "NODE_OPTIONS=\"-r ./scripts/patch-fs.js\" next start -H 0.0.0.0 -p ${PORT:-3000}",
     "lint": "next lint",
     "seed": "tsx prisma/seed.ts",
