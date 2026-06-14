@@ -4,16 +4,25 @@ import ShipmentsClient from "./ShipmentsClient";
 export const dynamic = "force-dynamic";
 
 export default async function ShipmentsPage() {
-  const prisma = getPrisma();
-  const shipments = await prisma.shipment.findMany({
-    include: { partner: true, agent: true, deliveryAttempts: true },
-    orderBy: { createdAt: "desc" },
-  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let shipments: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let partners: any[] = [];
 
-  const partners = await prisma.partner.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-  });
+  try {
+    const prisma = getPrisma();
+    shipments = await prisma.shipment.findMany({
+      include: { partner: true, agent: true, deliveryAttempts: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    partners = await prisma.partner.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    });
+  } catch (err) {
+    console.warn("[shipments] DB unavailable:", err instanceof Error ? err.message : err);
+  }
 
   const serialized = shipments.map((s) => ({
     id: s.id,
@@ -27,7 +36,8 @@ export default async function ShipmentsPage() {
     status: s.status,
     agentName: s.agent?.name ?? null,
     agentId: s.agentId,
-    deliveryAttempts: s.deliveryAttempts.map((a) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    deliveryAttempts: s.deliveryAttempts.map((a: any) => ({
       id: a.id,
       time: a.attemptDate.toISOString(),
       agentName: s.agent?.name ?? "",

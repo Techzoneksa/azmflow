@@ -18,22 +18,28 @@ export async function login(formData: FormData) {
     const prisma = getPrisma();
 
     let userCount = 0;
+    let tablesReady = true;
     try {
       userCount = await prisma.user.count();
     } catch (tableErr: unknown) {
-      const msg =
-        tableErr instanceof Error ? tableErr.message : "";
+      const msg = tableErr instanceof Error ? tableErr.message : "";
       if (
         msg.includes("does not exist") ||
         msg.includes("relation") ||
         msg.includes("Base table")
       ) {
-        return {
-          error:
-            "لم يتم العثور على جداول قاعدة البيانات. يُرجى فتح Supabase Dashboard ← SQL Editor ← New Query وتشغيل ملف schema.sql.",
-        };
+        tablesReady = false;
+        userCount = 0;
+      } else {
+        throw tableErr;
       }
-      throw tableErr;
+    }
+
+    if (!tablesReady) {
+      return {
+        error:
+          "لم يتم العثور على جداول قاعدة البيانات. يُرجى فتح Supabase Dashboard ← SQL Editor ← New Query وتشغيل ملف schema.sql.",
+      };
     }
 
     if (userCount === 0) {
