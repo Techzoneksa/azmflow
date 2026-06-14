@@ -37,7 +37,7 @@ const NAV_GROUPS = [
     label: "الإدارة",
     icon: ChevronDown,
     items: [
-      { label: "المناديب", href: "/agent/dashboard", icon: Users },
+      { label: "المناديب", href: "/agents", icon: Users },
       { label: "المركبات", href: "#", icon: Car },
       { label: "الشركاء", href: "/partners", icon: Handshake },
       { label: "العقود", href: "#", icon: FileText },
@@ -50,7 +50,7 @@ const NAV_GROUPS = [
       { label: "مركز الجاهزية", href: "/readiness", icon: Activity },
       { label: "التقارير", href: "/reports", icon: BarChart3 },
       { label: "المستخدمون", href: "/users", icon: UserCog },
-      { label: "الإعدادات", href: "#", icon: Settings },
+      { label: "الإعدادات", href: "/settings", icon: Settings },
     ],
   },
 ];
