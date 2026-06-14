@@ -1,9 +1,10 @@
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 import ShipmentsClient from "./ShipmentsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function ShipmentsPage() {
+  const prisma = getPrisma();
   const shipments = await prisma.shipment.findMany({
     include: { partner: true, agent: true, deliveryAttempts: true },
     orderBy: { createdAt: "desc" },

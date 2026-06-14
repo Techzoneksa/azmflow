@@ -3,18 +3,19 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 
 export async function login(formData: FormData) {
-  const username = formData.get("username") as string;
-  const password = formData.get("password") as string;
-
-  if (!username || !password) {
-    return { error: "يرجى إدخال اسم المستخدم وكلمة المرور" };
-  }
-
-  let user;
   try {
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+
+    if (!username || !password) {
+      return { error: "يرجى إدخال اسم المستخدم وكلمة المرور" };
+    }
+
+    const prisma = getPrisma();
+
     const userCount = await prisma.user.count();
     if (userCount === 0) {
       const hashedPassword = await bcrypt.hash("password123", 12);
@@ -28,25 +29,27 @@ export async function login(formData: FormData) {
         },
       });
     }
-    user = await prisma.user.findUnique({ where: { username } });
-  } catch {
-    return { error: "خطأ في قاعدة البيانات. تأكد من تعيين DATABASE_URL في متغيرات البيئة، ثم شغّل npm start" };
+
+    const user = await prisma.user.findUnique({ where: { username } });
+    if (!user) return { error: "بيانات الدخول غير صحيحة" };
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) return { error: "بيانات الدخول غير صحيحة" };
+
+    const cookieStore = await cookies();
+    cookieStore.set("session", JSON.stringify({ id: user.id, name: user.name, role: user.role }), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    redirect("/dashboard");
+  } catch (err) {
+    console.error("[LOGIN_ERROR]", err);
+    return { error: "حدث خطأ في السيرفر أو الاتصال بقاعدة البيانات. يرجى المحاولة لاحقاً." };
   }
-  if (!user) return { error: "بيانات الدخول غير صحيحة" };
-
-  const isValid = await bcrypt.compare(password, user.password);
-  if (!isValid) return { error: "بيانات الدخول غير صحيحة" };
-
-  const cookieStore = await cookies();
-  cookieStore.set("session", JSON.stringify({ id: user.id, name: user.name, role: user.role }), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24,
-  });
-
-  redirect("/dashboard");
 }
 
 export async function logout() {

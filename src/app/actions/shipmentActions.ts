@@ -1,8 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 
 export async function getAllShipments() {
+  const prisma = getPrisma();
   const shipments = await prisma.shipment.findMany({
     include: {
       partner: true,
@@ -16,6 +17,7 @@ export async function getAllShipments() {
 }
 
 export async function getShipmentById(id: string) {
+  const prisma = getPrisma();
   const shipment = await prisma.shipment.findUnique({
     where: { id },
     include: {
@@ -32,6 +34,7 @@ export async function getShipmentById(id: string) {
 }
 
 export async function assignShipments(shipmentIds: string[], agentId: string) {
+  const prisma = getPrisma();
   await prisma.shipment.updateMany({
     where: { id: { in: shipmentIds } },
     data: { agentId, status: "ASSIGNED" },
@@ -39,6 +42,7 @@ export async function assignShipments(shipmentIds: string[], agentId: string) {
 }
 
 export async function getShipmentsByAgent(agentId: string) {
+  const prisma = getPrisma();
   const shipments = await prisma.shipment.findMany({
     where: { agentId },
     include: {

@@ -20,7 +20,8 @@ export async function GET() {
   }
 
   try {
-    const { prisma } = await import("@/lib/prisma");
+    const { getPrisma } = await import("@/lib/prisma");
+    const prisma = getPrisma();
     await prisma.$queryRaw`SELECT 1`;
     diagnostics.status = "healthy";
     diagnostics.database_reachable = true;

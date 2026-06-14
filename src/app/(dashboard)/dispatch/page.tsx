@@ -1,9 +1,10 @@
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 import DispatchClient from "./DispatchClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function DispatchPage() {
+  const prisma = getPrisma();
   const unassigned = await prisma.shipment.findMany({
     where: { status: { in: ["NEW", "READY"] }, agentId: null },
     include: { partner: true },
