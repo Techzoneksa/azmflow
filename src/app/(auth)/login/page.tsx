@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { login } from "@/app/actions/authActions";
+import { safeAction } from "@/lib/server-action";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -31,9 +32,14 @@ export default function LoginPage() {
     formData.set("password", password);
     console.log("[LOGIN] calling server action...");
     try {
-      const result = await login(formData);
+      const result = await safeAction(() => login(formData));
       console.log("[LOGIN] server action returned:", result);
       setLoading(false);
+      if (result.stale) {
+        setError("انتهت صلاحية الجلسة. يتم تحديث الصفحة...");
+        setTimeout(() => window.location.reload(), 2000);
+        return;
+      }
       if (result?.error) {
         setError(result.error);
       }

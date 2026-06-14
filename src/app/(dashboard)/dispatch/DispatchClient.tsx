@@ -16,6 +16,7 @@ import { Select } from "@/components/ui/select";
 import PageTransition from "@/components/layout/PageTransition";
 import { Toaster, toast } from "sonner";
 import { assignShipments } from "@/app/actions/shipmentActions";
+import { safeAction } from "@/lib/server-action";
 
 interface ShipmentItem {
   id: string;
@@ -78,15 +79,22 @@ export default function DispatchClient({
         });
         return;
       }
-      try {
-        await assignShipments(Array.from(selectedIds), agentId);
-        toast.success(`تم إسناد الشحنات بنجاح للمندوب ${agentName}`, {
-          description: `عدد الشحنات: ${selectedIds.size}`,
-        });
-        setSelectedIds(new Set());
-      } catch {
-        toast.error("حدث خطأ أثناء الإسناد");
+      const result = await safeAction(() =>
+        assignShipments(Array.from(selectedIds), agentId)
+      );
+      if (result.stale) {
+        toast.error(result.error!);
+        setTimeout(() => window.location.reload(), 2000);
+        return;
       }
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(`تم إسناد الشحنات بنجاح للمندوب ${agentName}`, {
+        description: `عدد الشحنات: ${selectedIds.size}`,
+      });
+      setSelectedIds(new Set());
     },
     [selectedIds]
   );
