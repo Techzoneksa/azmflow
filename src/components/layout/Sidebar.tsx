@@ -37,7 +37,7 @@ const NAV_GROUPS = [
     label: "الإدارة",
     icon: ChevronDown,
     items: [
-      { label: "المناديب", href: "#", icon: Users },
+      { label: "المناديب", href: "/agent/dashboard", icon: Users },
       { label: "المركبات", href: "#", icon: Car },
       { label: "الشركاء", href: "/partners", icon: Handshake },
       { label: "العقود", href: "#", icon: FileText },
