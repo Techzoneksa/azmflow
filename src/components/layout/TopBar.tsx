@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Search, Bell, ChevronLeft, LogOut, User } from "lucide-react";
+import { Search, Bell, ChevronLeft, LogOut, User, Menu, PanelLeftClose, PanelLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
+import { useSidebar } from "@/context/SidebarContext";
 
 const BREADCRUMBS: Record<string, string> = {
   "/dashboard": "لوحة التحكم",
@@ -20,6 +21,7 @@ const BREADCRUMBS: Record<string, string> = {
 export default function TopBar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { isCollapsed, toggleCollapsed, openMobile } = useSidebar();
 
   const crumbs = pathname
     .split("/")
@@ -27,20 +29,43 @@ export default function TopBar() {
     .map((seg) => "/" + seg);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-surface/80 backdrop-blur-xl px-6">
-      <div className="flex items-center gap-2 text-sm text-text-muted">
-        {crumbs.map((crumb, i) => (
-          <span key={crumb} className="flex items-center gap-2">
-            {i > 0 && <ChevronLeft className="h-3.5 w-3.5" />}
-            <span className={i === crumbs.length - 1 ? "text-text-primary" : ""}>
-              {BREADCRUMBS[crumb] || crumb.split("/").pop()}
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-surface/80 backdrop-blur-xl px-4 lg:px-6">
+      {/* Right side */}
+      <div className="flex items-center gap-1 lg:gap-2">
+        {/* Hamburger — mobile only */}
+        <button
+          onClick={openMobile}
+          className="flex lg:hidden rounded-lg p-2 text-text-secondary hover:bg-surface-2 transition-all"
+          aria-label="فتح القائمة"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        {/* Collapse toggle — desktop only */}
+        <button
+          onClick={toggleCollapsed}
+          className="hidden lg:flex rounded-lg p-2 text-text-secondary hover:bg-surface-2 transition-all"
+          aria-label={isCollapsed ? "توسيع القائمة" : "طي القائمة"}
+        >
+          {isCollapsed ? <PanelLeft className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+        </button>
+
+        {/* Breadcrumbs */}
+        <div className="flex items-center gap-2 text-sm text-text-muted">
+          {crumbs.map((crumb, i) => (
+            <span key={crumb} className="flex items-center gap-2">
+              {i > 0 && <ChevronLeft className="h-3.5 w-3.5" />}
+              <span className={i === crumbs.length - 1 ? "text-text-primary" : ""}>
+                {BREADCRUMBS[crumb] || crumb.split("/").pop()}
+              </span>
             </span>
-          </span>
-        ))}
+          ))}
+        </div>
       </div>
 
+      {/* Left side */}
       <div className="mr-auto flex items-center gap-4">
-        <div className="relative w-64">
+        <div className="relative w-40 lg:w-64">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
           <Input
             placeholder="بحث..."
