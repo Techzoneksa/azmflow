@@ -30,7 +30,7 @@ export async function login(formData: FormData) {
     }
     user = await prisma.user.findUnique({ where: { username } });
   } catch {
-    return { error: "تعذر الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى" };
+    return { error: "خطأ في قاعدة البيانات. تأكد من تعيين DATABASE_URL في متغيرات البيئة، ثم شغّل npm start" };
   }
   if (!user) return { error: "بيانات الدخول غير صحيحة" };
 
