@@ -19,9 +19,14 @@ async function main() {
   const hashedPassword = await bcrypt.hash("password123", 12);
 
   const admin = await prisma.user.create({
-    data: { name: "مدير النظام", username: "admin", phone: "0500000000", password: hashedPassword, role: "ADMIN" },
+    data: { name: "مدير النظام", username: "admin", phone: "0500000000", password: hashedPassword, role: "SUPER_ADMIN", jobTitle: "مدير عام" },
   });
   console.log(`✅ Admin created: ${admin.name}`);
+
+  const dispatcher = await prisma.user.create({
+    data: { name: "منسق التوزيع", username: "coordinator", phone: "0500000001", password: hashedPassword, role: "DISPATCHER", jobTitle: "منسق توزيع" },
+  });
+  console.log(`✅ Dispatcher created: ${dispatcher.name}`);
 
   const partnersData = [
     { name: "نون", type: "ECOMMERCE" as const, city: "الرياض", phone: "0111111111" },

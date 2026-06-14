@@ -8,7 +8,12 @@ datasource db {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
+  GENERAL_MANAGER
+  PROJECT_MANAGER
+  ACCOUNTANT
+  DATA_ENTRY
   DISPATCHER
   AGENT
 }
@@ -35,6 +40,7 @@ model User {
   username  String   @unique
   phone     String   @unique
   role      UserRole
+  jobTitle  String   @default("")
   password  String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())

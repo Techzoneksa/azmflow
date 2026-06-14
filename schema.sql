@@ -19,7 +19,7 @@ DROP FUNCTION IF EXISTS "update_updated_at_column" CASCADE;
 
 -- ===================== ENUMS =====================
 
-CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'DISPATCHER', 'AGENT');
+CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'GENERAL_MANAGER', 'PROJECT_MANAGER', 'ACCOUNTANT', 'DATA_ENTRY', 'DISPATCHER', 'AGENT');
 
 CREATE TYPE "PartnerType" AS ENUM ('ECOMMERCE', 'LOGISTICS');
 
@@ -43,6 +43,7 @@ CREATE TABLE "User" (
   "phone"     TEXT        NOT NULL,
   "role"      "UserRole" NOT NULL,
   "password"  TEXT        NOT NULL,
+  "jobTitle"  TEXT        NOT NULL DEFAULT '',
   "isActive"  BOOLEAN     NOT NULL DEFAULT TRUE,
   "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP

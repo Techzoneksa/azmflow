@@ -50,7 +50,7 @@ export async function login(formData: FormData) {
           username: "admin",
           phone: "0500000000",
           password: hashedPassword,
-          role: "ADMIN",
+          role: "SUPER_ADMIN",
         },
       });
     }

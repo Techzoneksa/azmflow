@@ -49,7 +49,7 @@ const NAV_GROUPS = [
     items: [
       { label: "مركز الجاهزية", href: "/readiness", icon: Activity },
       { label: "التقارير", href: "/reports", icon: BarChart3 },
-      { label: "المستخدمون", href: "#", icon: UserCog },
+      { label: "المستخدمون", href: "/users", icon: UserCog },
       { label: "الإعدادات", href: "#", icon: Settings },
     ],
   },
