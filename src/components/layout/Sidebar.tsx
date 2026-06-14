@@ -6,7 +6,8 @@ import {
   LayoutDashboard,
   Package,
   Truck,
-  Undo2,
+  RotateCcw,
+  FileUp,
   Users,
   Car,
   Handshake,
@@ -26,9 +27,10 @@ const NAV_GROUPS = [
     icon: ChevronDown,
     items: [
       { label: "لوحة التحكم", href: "/dashboard", icon: LayoutDashboard },
+      { label: "استيراد الشحنات", href: "/import", icon: FileUp },
       { label: "الشحنات", href: "/shipments", icon: Package },
-      { label: "التوزيع", href: "#", icon: Truck },
-      { label: "المرتجعات", href: "#", icon: Undo2 },
+      { label: "التوزيع", href: "/dispatch", icon: Truck },
+      { label: "المرتجعات", href: "/returns", icon: RotateCcw },
     ],
   },
   {
@@ -37,7 +39,7 @@ const NAV_GROUPS = [
     items: [
       { label: "المناديب", href: "#", icon: Users },
       { label: "المركبات", href: "#", icon: Car },
-      { label: "الشركاء", href: "#", icon: Handshake },
+      { label: "الشركاء", href: "/partners", icon: Handshake },
       { label: "العقود", href: "#", icon: FileText },
     ],
   },
@@ -45,8 +47,8 @@ const NAV_GROUPS = [
     label: "النظام",
     icon: ChevronDown,
     items: [
-      { label: "مركز الجاهزية", href: "#", icon: Activity },
-      { label: "التقارير", href: "#", icon: BarChart3 },
+      { label: "مركز الجاهزية", href: "/readiness", icon: Activity },
+      { label: "التقارير", href: "/reports", icon: BarChart3 },
       { label: "المستخدمون", href: "#", icon: UserCog },
       { label: "الإعدادات", href: "#", icon: Settings },
     ],

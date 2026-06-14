@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  DISPATCHER
+  AGENT
+}
+
+enum PartnerType {
+  ECOMMERCE
+  LOGISTICS
+}
+
+enum ShipmentStatus {
+  NEW
+  RECEIVED
+  READY
+  ASSIGNED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RETURNED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  role      UserRole
+  password  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shipments            Shipment[]        @relation("AgentShipments")
+  deliveryAttempts     DeliveryAttempt[]
+}
+
+model Partner {
+  id        String      @id @default(cuid())
+  name      String
+  type      PartnerType
+  city      String
+  phone     String
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+
+  shipments Shipment[]
+}
+
+model Shipment {
+  id              String         @id @default(cuid())
+  trackingNumber  String         @unique
+  partnerId       String
+  agentId         String?
+  customerName    String
+  customerPhone   String
+  district        String
+  status          ShipmentStatus @default(NEW)
+  notes           String?
+  createdAt       DateTime       @default(now())
+
+  partner         Partner         @relation(fields: [partnerId], references: [id])
+  agent           User?           @relation("AgentShipments", fields: [agentId], references: [id])
+  deliveryAttempts DeliveryAttempt[]
+}
+
+model DeliveryAttempt {
+  id            String         @id @default(cuid())
+  shipmentId    String
+  agentId       String
+  failureReason String?
+  attemptDate   DateTime       @default(now())
+
+  shipment      Shipment       @relation(fields: [shipmentId], references: [id])
+  agent         User           @relation(fields: [agentId], references: [id])
+}
